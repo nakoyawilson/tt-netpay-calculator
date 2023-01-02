@@ -7,6 +7,14 @@ let periodEnd;
 $(function () {
   $('input[name="daterange"]').daterangepicker({
     autoUpdateInput: false,
+    autoApply: true,
+    ranges: {
+      "This Month": [moment().startOf("month"), moment().endOf("month")],
+      "Last Month": [
+        moment().subtract(1, "month").startOf("month"),
+        moment().subtract(1, "month").endOf("month"),
+      ],
+    },
     locale: {
       cancelLabel: "Clear",
     },
@@ -93,14 +101,26 @@ calculator.addEventListener("submit", (e) => {
       ? 133.3
       : 138.1;
   let netPay;
+  let paye;
   if (grossPay < 7500.01) {
     netPay = grossPay - (healthSurcharge + nis) * numberMondays;
-    console.log(netPay);
-    answer.textContent = formatNumber(netPay);
-    document.querySelector("#resultscontainer").style.display = "block";
   } else {
-    console.log("need to deduct taxes");
+    const currentYear = new Date().getFullYear();
+    const yearStart = new Date(`${currentYear}-01-01 00:00:00`);
+    const yearEnd = new Date(`${currentYear}-12-31 00:00:00`);
+    const taxExemptionLimit = 90000;
+    const pensionDeductions = 0;
+    const annualIncome = grossPay * 12;
+    const totalMondays = countCertainDays([1], yearStart, yearEnd);
+    const nisDeduction = nis * totalMondays * 0.7;
+    const nonchargeableIncome =
+      taxExemptionLimit + nisDeduction + pensionDeductions;
+    const taxableIncome = nonchargeableIncome - annualIncome;
+    paye = (taxableIncome * 0.25) / 12;
+    netPay = grossPay - ((healthSurcharge + nis) * numberMondays + paye);
   }
+  answer.textContent = formatNumber(netPay);
+  document.querySelector("#resultscontainer").style.display = "block";
 });
 
 copyButton.addEventListener("click", () => {
