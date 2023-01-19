@@ -1,5 +1,8 @@
 const calculator = document.querySelector("#calculator");
 const answer = document.querySelector("#answer");
+const nisText = document.querySelector("#nis");
+const healthSurchargeText = document.querySelector("#healthsurcharge");
+const payeText = document.querySelector("#paye");
 const copyButton = document.querySelector("#copybtn");
 let periodStart;
 let periodEnd;
@@ -105,21 +108,15 @@ calculator.addEventListener("submit", (e) => {
   if (grossPay < 7500.01) {
     netPay = grossPay - (healthSurcharge + nis) * numberMondays;
   } else {
-    const currentYear = new Date().getFullYear();
-    const yearStart = new Date(`${currentYear}-01-01 00:00:00`);
-    const yearEnd = new Date(`${currentYear}-12-31 00:00:00`);
-    const taxExemptionLimit = 90000;
-    const pensionDeductions = 0;
-    const annualIncome = grossPay * 12;
-    const totalMondays = countCertainDays([1], yearStart, yearEnd);
-    const nisDeduction = nis * totalMondays * 0.7;
-    const nonchargeableIncome =
-      taxExemptionLimit + nisDeduction + pensionDeductions;
-    const taxableIncome = nonchargeableIncome - annualIncome;
-    paye = (taxableIncome * 0.25) / 12;
+    paye = calculate_paye(grossPay, nis);
     netPay = grossPay - ((healthSurcharge + nis) * numberMondays + paye);
   }
   answer.textContent = formatNumber(netPay);
+  nisText.textContent = nis ? formatNumber(nis * numberMondays) : "0.00";
+  healthSurchargeText.textContent = healthSurcharge
+    ? formatNumber(healthSurcharge * numberMondays)
+    : "0.00";
+  payeText.textContent = paye ? formatNumber(paye) : "0.00";
   document.querySelector("#resultscontainer").style.display = "block";
 });
 
@@ -130,3 +127,18 @@ copyButton.addEventListener("click", () => {
     copyButton.textContent = "Copy";
   }, 1000);
 });
+
+function calculate_paye(pay, contributions) {
+  const currentYear = new Date().getFullYear();
+  const yearStart = new Date(`${currentYear}-01-01 00:00:00`);
+  const yearEnd = new Date(`${currentYear}-12-31 00:00:00`);
+  const taxExemptionLimit = 90000;
+  const pensionDeductions = 0;
+  const annualIncome = pay * 12;
+  const totalMondays = countCertainDays([1], yearStart, yearEnd);
+  const nisDeduction = contributions * totalMondays * 0.7;
+  const nonchargeableIncome =
+    taxExemptionLimit + nisDeduction + pensionDeductions;
+  const taxableIncome = annualIncome - nonchargeableIncome;
+  return (taxableIncome * 0.25) / 12;
+}
