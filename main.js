@@ -139,6 +139,9 @@ function calculate_paye(pay, contributions) {
   const nisDeduction = contributions * totalMondays * 0.7;
   const nonchargeableIncome =
     taxExemptionLimit + nisDeduction + pensionDeductions;
-  const taxableIncome = annualIncome - nonchargeableIncome;
+  const taxableIncome =
+    annualIncome - nonchargeableIncome > 0
+      ? annualIncome - nonchargeableIncome
+      : 0;
   return (taxableIncome * 0.25) / 12;
 }
