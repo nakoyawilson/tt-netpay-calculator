@@ -103,14 +103,9 @@ calculator.addEventListener("submit", (e) => {
       : grossPay < 13600
       ? 133.3
       : 138.1;
-  let netPay;
-  let paye;
-  if (grossPay < 7500.01) {
-    netPay = grossPay - (healthSurcharge + nis) * numberMondays;
-  } else {
-    paye = calculate_paye(grossPay, nis);
-    netPay = grossPay - ((healthSurcharge + nis) * numberMondays + paye);
-  }
+
+  const paye = calculate_paye(grossPay, nis);
+  const netPay = grossPay - ((healthSurcharge + nis) * numberMondays + paye);
   answer.textContent = formatNumber(netPay);
   nisText.textContent = nis ? formatNumber(nis * numberMondays) : "0.00";
   healthSurchargeText.textContent = healthSurcharge
