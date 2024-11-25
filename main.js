@@ -124,9 +124,9 @@ copyButton.addEventListener("click", () => {
 });
 
 function calculate_paye(pay, contributions) {
-  const currentYear = new Date().getFullYear();
-  const yearStart = new Date(`${currentYear}-01-01 00:00:00`);
-  const yearEnd = new Date(`${currentYear}-12-31 00:00:00`);
+  const yearToAssess = periodStart.getFullYear();
+  const yearStart = new Date(`${yearToAssess}-01-01 00:00:00`);
+  const yearEnd = new Date(`${yearToAssess}-12-31 00:00:00`);
   const taxExemptionLimit = 90000;
   const pensionDeductions = 0;
   const annualIncome = pay * 12;
